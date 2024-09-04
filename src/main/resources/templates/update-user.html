@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/template}"
+      lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Update existing User</title>
+</head>
+<body>
+<div layout:fragment="content" style="margin: 0 auto; width: max-content">
+    <h2>Update existing User</h2>
+    <form th:object="${user}" method="post">
+<!--        <input th:unless="${#authentication.details.role.name == 'ADMIN'}" type="hidden" name="roleId" value="0"/>-->
+        <input type="hidden" name="id" th:value="*{id}"/>
+
+
+        <div class="mb-3">
+            <label for="id" class="form-label">Id</label>
+            <input type="text" class="form-control" th:field="*{id}" id="id" th:value="*{id}" disabled/>
+        </div>
+
+        <div class="mb-3">
+            <label for="firstName" class="form-label">First name</label>
+            <input type="text" class="form-control" th:field="*{firstName}" id="firstName" th:value="*{firstName}"/>
+            <div class="invalid-feedback d-block">
+                <span th:if="${#fields.hasErrors('firstName')}" th:errors="*{firstName}"></span>
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label for="lastName" class="form-label">Last name</label>
+            <input type="text" class="form-control" th:field="*{lastName}" id="lastName" th:value="*{lastName}"/>
+            <div class="invalid-feedback d-block">
+                <span th:if="${#fields.hasErrors('lastName')}" th:errors="*{lastName}"></span>
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label for="email" class="form-label">Email</label>
+            <input type="text" class="form-control" th:field="*{email}" id="email" th:value="*{email}"/>
+            <div class="invalid-feedback d-block">
+                <span th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></span>
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label for="role" class="form-label">Role</label>
+            <select name="userRole" id="role" th:field="*{role}" class="form-select">
+                        <span th:each="role : ${roles}">
+                            <option th:text="${role.name.substring(0, 1) + role.name.substring(1).toLowerCase()}"
+                                    th:value="${role}"/>
+                        </span>
+            </select>
+            <div class="invalid-feedback d-block">
+                <span th:if="${#fields.hasErrors('role')}" th:errors="*{role}"></span>
+            </div>
+        </div>
+        <div>
+            <input type="submit" value="Update" class="btn btn-primary"/>
+            <input type="reset" value="Clear" class="btn btn-outline-secondary"/>
+        </div>
+
+
+    </form>
+
+<!--    <h2 class="mt-4">Change password</h2>-->
+<!--    TODO-->
+    <!--        <form>-->
+    <!--            <tr>-->
+    <!--                <td>-->
+    <!--                    <label for="old-password">Old Password:</label>-->
+    <!--                </td>-->
+    <!--                <td>-->
+    <!--                    <input type="password" name="oldPassword" id="old-password" required />-->
+    <!--                </td>-->
+    <!--                <td>-->
+    <!--                    <span th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></span>-->
+    <!--                </td>-->
+    <!--            </tr>-->
+    <!--            <tr>-->
+    <!--                <td>-->
+    <!--                    <label for="new-password">New Password:</label>-->
+    <!--                </td>-->
+    <!--                <td>-->
+    <!--                    <input type="password" th:field="*{password}" id="new-password" required />-->
+    <!--                </td>-->
+    <!--            </tr>-->
+    <!--        </form>-->
+
+</div>
+</body>
+</html>

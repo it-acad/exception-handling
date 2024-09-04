@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/template}"
+      lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Create new Task</title>
+</head>
+<body>
+<div layout:fragment="content" style="margin: 0 auto; width: max-content">
+    <h2>Create new Task</h2>
+    <form th:action="@{|/tasks/create/todos/${todo.id}|}" th:object="${task}" method="post">
+
+        <input type="hidden" name="todoId" th:value="${todo.id}">
+
+        <div class="mb-3">
+            <label for="name" class="form-label">Name</label>
+            <input type="text" class="form-control" th:field="*{name}" id="name">
+            <div class="invalid-feedback d-block">
+                <span th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></span>
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label for="priority" class="form-label">Priority</label>
+            <select name="priority" id="priority" class="form-select">
+                <option th:each="priority : ${priorities}" th:value="${priority}" th:text="${priority.name()
+                            .substring(0, 1) + priority.name().substring(1).toLowerCase()}"/>
+            </select>
+            <div class="invalid-feedback d-block">
+                <span th:if="${#fields.hasErrors('priority')}" th:errors="*{priority}"></span>
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <input type="reset" class="btn btn-outline-secondary" value="Clear"/>
+            <input type="submit" class="btn btn-primary" value="Create"/>
+        </div>
+
+    </form>
+    <br>
+    <a th:href="@{|/todos/${todo.id}/read|}">Go to Task List</a>
+</div>
+</body>
+</html>
