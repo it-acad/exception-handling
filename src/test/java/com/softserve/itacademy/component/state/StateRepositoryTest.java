@@ -2,17 +2,28 @@ package com.softserve.itacademy.component.state;
 
 import com.softserve.itacademy.model.State;
 import com.softserve.itacademy.repository.StateRepository;
-import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.test.context.TestPropertySource;
 
 import java.util.List;
+import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @DataJpaTest
-class StateRepositoryTest {
+@TestPropertySource(properties = {
+        "spring.test.database.replace=NONE",
+        "spring.datasource.url=jdbc:h2:mem:test;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH",
+        "spring.datasource.username=sa",
+        "spring.datasource.password=",
+        "spring.jpa.hibernate.ddl-auto=update",
+        "spring.sql.init.mode=never"
+})
+public class StateRepositoryTest {
 
     private final StateRepository stateRepository;
 
@@ -21,50 +32,59 @@ class StateRepositoryTest {
         this.stateRepository = stateRepository;
     }
 
-    @Test
-    @DisplayName("Get the state by name when it is present")
-    void testGetByName_1() {
-        State state2 = new State();
-        state2.setName("state #1");
-
-        State expected = stateRepository.save(state2);
-        State actual = stateRepository.findByName("state #1");
-
-        assertEquals(expected, actual);
+    @BeforeEach
+    void setup() {
+        stateRepository.deleteAll(); // Очищення бази даних перед кожним тестом
     }
 
     @Test
-    @DisplayName("Get the state by name when it is absent")
-    void testGetByName_2() {
+    void testFindByName_existingState() {
+        // Створення та збереження станів
         State state1 = new State();
-        state1.setName("state #1");
-        stateRepository.save(state1);
-
-        State actual = stateRepository.findByName("state #2");
-
-        assertNull(actual);
-    }
-
-    @Test
-    @DisplayName("Get all states")
-    void testGetAll() {
-        State state1 = new State();
-        state1.setName("state #1");
+        state1.setName("Active");
         stateRepository.save(state1);
 
         State state2 = new State();
-        state2.setName("state #2");
+        state2.setName("Inactive");
         stateRepository.save(state2);
 
-        State state3 = new State();
-        state3.setName("state #3");
-        stateRepository.save(state3);
+        // Виклик методу та перевірка результату
+        State expected = stateRepository.findByName("Inactive");
+        assertThat(expected).isNotNull();
+        assertEquals("Inactive", expected.getName());
+    }
 
+    @Test
+    void testFindByName_nonExistingState() {
+        // Перевірка на відсутність стану в базі
+        Optional<State> actual = Optional.ofNullable(stateRepository.findByName("NonExistent"));
+        assertThat(actual).isEmpty();
+    }
+
+    @Test
+    void testFindAllByOrderById() {
+        // Створення та збереження станів
+        State state1 = new State();
+        state1.setName("Active");
         stateRepository.save(state1);
 
-        List<State> expected = List.of(state1, state2, state3);
-        List<State> actual = stateRepository.findAllByOrderById();
+        State state2 = new State();
+        state2.setName("Inactive");
+        stateRepository.save(state2);
 
-        assertArrayEquals(expected.toArray(), actual.toArray());
+        // Виклик методу та перевірка результату
+        List<State> states = stateRepository.findAllByOrderById();
+        assertThat(states).hasSize(2);
+
+        // Перевірка порядку та значень полів
+        assertThat(states.get(0)).isEqualToComparingFieldByField(state1);
+        assertThat(states.get(1)).isEqualToComparingFieldByField(state2);
+    }
+
+    @Test
+    void testFindAllByOrderById_emptyDatabase() {
+        // Перевірка, що база даних порожня
+        List<State> states = stateRepository.findAllByOrderById();
+        assertThat(states).isEmpty();
     }
 }

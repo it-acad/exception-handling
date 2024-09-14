@@ -2,10 +2,9 @@ package com.softserve.itacademy.controller;
 
 import com.softserve.itacademy.dto.TaskDto;
 import com.softserve.itacademy.model.TaskPriority;
-import com.softserve.itacademy.service.TaskService;
 import com.softserve.itacademy.dto.TaskTransformer;
-import com.softserve.itacademy.model.Task;
 import com.softserve.itacademy.service.StateService;
+import com.softserve.itacademy.service.TaskService;
 import com.softserve.itacademy.service.ToDoService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,63 +31,58 @@ public class TaskController {
         model.addAttribute("task", new TaskDto());
         model.addAttribute("todo", todoService.readById(todoId));
         model.addAttribute("priorities", TaskPriority.values());
-        log.info("Returning todo with id {} for creating new task for this todo", todoId);
+        System.out.println("Returning todo with id" + todoId + " for creating new task for this todo");
         return "create-task";
     }
 
     @PostMapping("/create/todos/{todo_id}")
     public String create(@PathVariable("todo_id") long todoId, Model model,
                          @Validated @ModelAttribute("task") TaskDto taskDto, BindingResult result) {
-        log.info("Received request to create task {}", taskDto);
+        System.out.println("Received request to create task " + taskDto);
         if (result.hasErrors()) {
             model.addAttribute("todo", todoService.readById(todoId));
             model.addAttribute("priorities", TaskPriority.values());
-            log.warn("Validation error for {}", taskDto);
+            System.out.println("Validation error for " + taskDto);
             return "create-task";
         }
 
         taskService.create(taskDto);
-        log.info("Task {} was created", taskDto);
+        System.out.println("Task " + taskDto + " was created");
 
         return "redirect:/todos/" + todoId + "/tasks";
     }
 
     @GetMapping("/{task_id}/update/todos/{todo_id}")
     public String taskUpdateForm(@PathVariable("task_id") long taskId, @PathVariable("todo_id") long todoId, Model model) {
-        log.info("Received request to get task with id {} from todo with id {} for updating this task", taskId, todoId);
+        System.out.println("Received request to get task with id " + taskId + "from todo with id " + todoId + "for updating this task");
         TaskDto taskDto = taskTransformer.convertToDto(taskService.readById(taskId));
         model.addAttribute("task", taskDto);
         model.addAttribute("priorities", TaskPriority.values());
         model.addAttribute("states", stateService.getAll());
-        log.info("Task {} was loaded", taskDto);
+        System.out.println("Task " + taskDto + " was loaded");
         return "update-task";
     }
 
     @PostMapping("/{task_id}/update/todos/{todo_id}")
     public String update(@PathVariable("task_id") long taskId, @PathVariable("todo_id") long todoId, Model model,
                          @Validated @ModelAttribute("task") TaskDto taskDto, BindingResult result) {
-        log.info("Received request to update task {}", taskDto);
+        System.out.println("Received request to update task " + taskDto);
         if (result.hasErrors()) {
             model.addAttribute("priorities", TaskPriority.values());
             model.addAttribute("states", stateService.getAll());
             return "update-task";
         }
-        Task task = taskTransformer.fillEntityFields(
-                new Task(),
-                taskDto,
-                todoService.readById(taskDto.getTodoId()),
-                stateService.readById(taskDto.getStateId())
-        );
-        taskService.update(task);
-        log.info("Task {} was updated", taskDto);
+
+        taskService.update(taskDto);
+        System.out.println("Task " + taskDto + " was updated");
         return "redirect:/todos/" + todoId + "/tasks";
     }
 
     @GetMapping("/{task_id}/delete/todos/{todo_id}")
     public String delete(@PathVariable("task_id") long taskId, @PathVariable("todo_id") long todoId) {
-        log.info("Received request to delete task with id {}", taskId);
+        System.out.println("Received request to delete task with id " + taskId);
         taskService.delete(taskId);
-        log.info("Task with id {} was deleted", taskId);
+        System.out.println("Task with id " + taskId + " was deleted");
         return "redirect:/todos/" + todoId + "/tasks";
     }
 }

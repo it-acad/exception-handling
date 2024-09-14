@@ -6,39 +6,45 @@
 <head>
     <meta charset="UTF-8">
     <title>List of Users</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
-<div layout:fragment="content" style="margin: 0 auto; width: max-content">
-    <h2>List of Users</h2>
-    <form th:action="@{/users/create}" method="get">
-        <input type="submit" class="btn btn-primary" value="Create new User">
+<div layout:fragment="content" class="container mt-5">
+    <h2 class="mb-4">List of Users</h2>
+    <form th:action="@{/users/create}" method="get" class="mb-3">
+        <input type="submit" class="btn btn-primary" value="Create New User">
     </form>
-    <br>
-    <table class="table">
+
+    <table class="table table-striped table-bordered">
+        <thead class="table-dark">
         <tr>
             <th>No.</th>
-            <!--            <th>Id</th>-->
-            <th>Full name</th>
-            <th>E-mail</th>
-            <th colspan="2">Operations</th>
+            <th>Full Name</th>
+            <th>Email</th>
+            <th colspan="2" class="text-center">Operations</th>
         </tr>
+        </thead>
+        <tbody>
         <tr th:each="user, iStat: ${users}">
-            <td th:text="${iStat.index + 1}"/>
-            <!--            <td th:text="${user.id}"/>-->
+            <td th:text="${iStat.index + 1}"></td>
             <input type="hidden" th:value="${user.id}" th:attr="name='id'"/>
             <td>
-                <a th:href="@{|/todos/all/users/${user.id}|}" th:text="${user.firstName + ' ' + user.lastName}"/>
+                <a th:href="@{|/todos/all/users/${user.id}|}" th:text="${user.firstName + ' ' + user.lastName}"></a>
             </td>
-            <td th:text="${user.email}"/>
-
-            <td>
-                <a th:href="@{|/users/${user.id}/update|}">Edit</a>
+            <td th:text="${user.email}"></td>
+            <td class="text-center">
+                <a th:href="@{|/users/${user.id}/update|}" class="btn btn-warning btn-sm">Edit</a>
             </td>
-            <td>
-                <a th:href="@{|/users/${user.id}/delete|}">Remove</a>
+            <td class="text-center">
+                <a th:href="@{|/users/${user.id}/delete|}" class="btn btn-danger btn-sm">Remove</a>
             </td>
         </tr>
+        </tbody>
     </table>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.7/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
 </body>
 </html>

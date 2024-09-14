@@ -5,65 +5,87 @@
       lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>New User registration</title>
+    <title>New User Registration</title>
+
+    <style>
+
+        .form-container {
+            margin: 0 auto;
+            max-width: 400px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .error-message {
+            color: #dc3545;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 14px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+
+        .btn-register {
+            background-color: #28a745;
+            color: #fff;
+        }
+
+        .btn-clear {
+            background-color: #dc3545;
+            color: #fff;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+        }
+    </style>
 </head>
 <body>
-    <div layout:fragment="content" style="margin: 0 auto; width: max-content">
-        <h2>New User registration</h2>
-        <form th:action="@{/users/create}" th:object="${user}" method="post">
-            <table>
-                <tr>
-                    <td>
-                        <label for="first-name">First name:</label>
-                    </td>
-                    <td>
-                        <input type="text" th:field="*{firstName}" id="first-name" />
-                    </td>
-                    <td>
-                        <span th:if="${#fields.hasErrors('firstName')}" th:errors="*{firstName}"></span>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <label for="last-name">Last name:</label>
-                    </td>
-                    <td>
-                        <input type="text" th:field="*{lastName}" id="last-name" />
-                    </td>
-                    <td>
-                        <span th:if="${#fields.hasErrors('lastName')}" th:errors="*{lastName}"></span>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <label for="email">E-mail:</label>
-                    </td>
-                    <td>
-                        <input type="text" th:field="*{email}" id="email" />
-                    </td>
-                    <td>
-                        <span th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></span>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <label for="password">Password:</label>
-                    </td>
-                    <td>
-                        <input type="password" th:field="*{password}" id="password" />
-                    </td>
-                    <td>
-                        <span th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></span>
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="2">
-                        <input type="submit" value="Register" />
-                        <input type="reset" value="Clear" />
-                    </td>
-                </tr>
-            </table>
-        </form>
-    </div>
+<div layout:fragment="content" class="form-container">
+    <h2 class="text-center">New User Registration</h2>
+    <form th:action="@{/users/create}" th:object="${user}" method="post">
+
+        <div class="form-group">
+            <label for="first-name">First name:</label>
+            <input type="text" th:field="*{firstName}" id="first-name" class="form-control" />
+            <div th:if="${#fields.hasErrors('firstName')}" th:errors="*{firstName}" class="error-message"></div>
+        </div>
+
+        <div class="form-group">
+            <label for="last-name">Last name:</label>
+            <input type="text" th:field="*{lastName}" id="last-name" class="form-control" />
+            <div th:if="${#fields.hasErrors('lastName')}" th:errors="*{lastName}" class="error-message"></div>
+        </div>
+
+        <div class="form-group">
+            <label for="email">E-mail:</label>
+            <input type="text" th:field="*{email}" id="email" class="form-control" />
+            <div th:if="${#fields.hasErrors('email')}" th:errors="*{email}" class="error-message"></div>
+        </div>
+
+        <div class="form-group">
+            <label for="password">Password:</label>
+            <input type="password" th:field="*{password}" id="password" class="form-control" />
+            <div th:if="${#fields.hasErrors('password')}" th:errors="*{password}" class="error-message"></div>
+        </div>
+
+        <div class="form-group text-center">
+            <button type="submit" class="btn btn-register">Register</button>
+            <button type="reset" class="btn btn-clear">Clear</button>
+        </div>
+    </form>
+</div>
 </body>
 </html>

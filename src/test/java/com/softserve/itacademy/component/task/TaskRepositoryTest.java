@@ -1,110 +1,143 @@
 package com.softserve.itacademy.component.task;
 
-import com.softserve.itacademy.model.Task;
-import com.softserve.itacademy.model.ToDo;
+import com.softserve.itacademy.model.*;
+import com.softserve.itacademy.repository.StateRepository;
 import com.softserve.itacademy.repository.TaskRepository;
 import com.softserve.itacademy.repository.ToDoRepository;
-import org.junit.jupiter.api.DisplayName;
+import com.softserve.itacademy.repository.UserRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.test.context.TestPropertySource;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @DataJpaTest
-class TaskRepositoryTest {
+@TestPropertySource(properties = {
+        "spring.test.database.replace=NONE",
+        "spring.datasource.url=jdbc:h2:mem:test;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH",
+        "spring.datasource.username=sa",
+        "spring.datasource.password=",
+        "spring.jpa.hibernate.ddl-auto=update",
+        "spring.sql.init.mode=never"
+})
+public class TaskRepositoryTest {
 
-    private final ToDoRepository todoRepository;
     private final TaskRepository taskRepository;
+    private final ToDoRepository toDoRepository;
+    private final StateRepository stateRepository;
+    private final UserRepository userRepository;
 
     @Autowired
-    public TaskRepositoryTest(ToDoRepository todoRepository, TaskRepository taskRepository) {
-        this.todoRepository = todoRepository;
+    public TaskRepositoryTest(TaskRepository taskRepository, ToDoRepository toDoRepository, StateRepository stateRepository, UserRepository userRepository) {
         this.taskRepository = taskRepository;
+        this.toDoRepository = toDoRepository;
+        this.stateRepository = stateRepository;
+        this.userRepository = userRepository;
+    }
+
+    @BeforeEach
+    void setup() {
+        taskRepository.deleteAll();
+        toDoRepository.deleteAll();
+        stateRepository.deleteAll();
+        userRepository.deleteAll();
     }
 
     @Test
-    @DisplayName("Get tasks by the todo ID when two tasks belong to the same todo")
-    void testGetByTodoId_1() {
-        ToDo todo = new ToDo();
-        todo.setTitle("test todo");
-        todo.setCreatedAt(LocalDateTime.now());
-        todo = todoRepository.save(todo);
+    void testGetByTodoId_existingTasks() {
+        // Створюємо нового користувача для owner
+        User owner = new User();
+        owner.setFirstName("John");
+        owner.setLastName("Doe");
+        owner.setEmail("john.doe@mail.com");
+        owner.setPassword("password123");
+        userRepository.save(owner); // Збереження користувача
 
+        // Створюємо новий об'єкт ToDo з заповненим owner і createdAt
+        ToDo toDo1 = new ToDo();
+        toDo1.setTitle("ToDo 1");
+        toDo1.setOwner(owner); // Призначаємо користувача власником
+        toDo1.setCreatedAt(LocalDateTime.now()); // Встановлюємо поточну дату
+        toDoRepository.save(toDo1);
+
+        // Повторюємо для іншого ToDo
+        ToDo toDo2 = new ToDo();
+        toDo2.setTitle("ToDo 2");
+        toDo2.setOwner(owner); // Призначаємо того ж власника
+        toDo2.setCreatedAt(LocalDateTime.now()); // Встановлюємо поточну дату
+        toDoRepository.save(toDo2);
+
+        // Створюємо новий State
+        State state = new State();
+        state.setName("New");
+        stateRepository.save(state);
+
+        // Створюємо завдання для ToDo 1
         Task task1 = new Task();
-        task1.setName("test task #1");
-        task1.setTodo(todo);
-        task1 = taskRepository.save(task1);
-
-        Task task2 = new Task();
-        task2.setName("test task #2");
-        task2.setTodo(todo);
-        task2 = taskRepository.save(task2);
-
-        List<Task> expected = List.of(task1, task2);
-        List<Task> actual = taskRepository.getByTodoId(todo.getId());
-
-        assertArrayEquals(expected.toArray(), actual.toArray());
-    }
-
-    @Test
-    @DisplayName("Get tasks by the todo ID when two tasks belong to the different todo")
-    void testGetByTodoId_2() {
-        ToDo todo1 = new ToDo();
-        todo1.setTitle("test todo #1");
-        todo1.setCreatedAt(LocalDateTime.now());
-        todo1 = todoRepository.save(todo1);
-
-        ToDo todo2 = new ToDo();
-        todo2.setTitle("test todo #2");
-        todo2.setCreatedAt(LocalDateTime.now());
-        todo2 = todoRepository.save(todo2);
-
-        Task task1 = new Task();
-        task1.setName("test task #1");
-        task1.setTodo(todo1);
-        task1 = taskRepository.save(task1);
-
-        Task task2 = new Task();
-        task2.setName("test task #2");
-        task2.setTodo(todo2);
-        taskRepository.save(task2);
-
-        List<Task> expected = List.of(task1);
-        List<Task> actual = taskRepository.getByTodoId(todo1.getId());
-
-        assertArrayEquals(expected.toArray(), actual.toArray());
-    }
-
-    @Test
-    @DisplayName("Get tasks by the todo ID when two tasks don't belong todo")
-    void testGetByTodoId_3() {
-        ToDo todo1 = new ToDo();
-        todo1.setTitle("test todo #1");
-        todo1.setCreatedAt(LocalDateTime.now());
-        todo1 = todoRepository.save(todo1);
-
-        ToDo todo2 = new ToDo();
-        todo2.setTitle("test todo #2");
-        todo2.setCreatedAt(LocalDateTime.now());
-        todo2 = todoRepository.save(todo2);
-
-        Task task1 = new Task();
-        task1.setName("test task #1");
-        task1.setTodo(todo1);
+        task1.setName("Task 1");
+        task1.setPriority(TaskPriority.HIGH);
+        task1.setTodo(toDo1);
+        task1.setState(state);
         taskRepository.save(task1);
 
         Task task2 = new Task();
-        task2.setName("test task #2");
-        task2.setTodo(todo1);
+        task2.setName("Task 2");
+        task2.setPriority(TaskPriority.LOW);
+        task2.setTodo(toDo1);
+        task2.setState(state);
         taskRepository.save(task2);
 
-        List<Task> expected = List.of();
-        List<Task> actual = taskRepository.getByTodoId(todo2.getId());
+        // Створюємо завдання для ToDo 2
+        Task task3 = new Task();
+        task3.setName("Task 3");
+        task3.setPriority(TaskPriority.MEDIUM);
+        task3.setTodo(toDo2);
+        task3.setState(state);
+        taskRepository.save(task3);
 
-        assertArrayEquals(expected.toArray(), actual.toArray());
+        // Перевіряємо метод getByTodoId для toDo1
+        List<Task> tasksForToDo1 = taskRepository.getByTodoId(toDo1.getId());
+        assertEquals(2, tasksForToDo1.size());
+
+        // Перевірка полів завдань
+        assertEquals("Task 1", tasksForToDo1.get(0).getName());
+        assertEquals(TaskPriority.HIGH, tasksForToDo1.get(0).getPriority());
+        assertEquals("Task 2", tasksForToDo1.get(1).getName());
+        assertEquals(TaskPriority.LOW, tasksForToDo1.get(1).getPriority());
     }
+    @Test
+    void testGetByTodoId_nonExistingTodo() {
+        // Перевіряємо, що для неіснуючого todoId повертається порожній список
+        List<Task> tasks = taskRepository.getByTodoId(999L);
+        assertThat(tasks).isEmpty();
+    }
+
+    @Test
+    void testGetByTodoId_noTasksForTodo() {
+        // Створюємо нового користувача для owner
+        User owner = new User();
+        owner.setFirstName("John");
+        owner.setLastName("Doe");
+        owner.setEmail("john.doe@mail.com");
+        owner.setPassword("password123");
+        userRepository.save(owner); // Зберігаємо користувача
+
+        // Створюємо новий об'єкт ToDo з заповненими полями owner і createdAt
+        ToDo toDo = new ToDo();
+        toDo.setTitle("Empty ToDo");
+        toDo.setOwner(owner); // Призначаємо користувача власником
+        toDo.setCreatedAt(LocalDateTime.now()); // Встановлюємо поточну дату і час
+        toDoRepository.save(toDo);
+
+        // Перевіряємо, що для цього ToDo немає завдань
+        List<Task> tasks = taskRepository.getByTodoId(toDo.getId());
+        assertThat(tasks).isEmpty();
+    }
+
 }

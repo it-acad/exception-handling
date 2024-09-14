@@ -2,102 +2,145 @@ package com.softserve.itacademy.component.todo;
 
 import com.softserve.itacademy.model.ToDo;
 import com.softserve.itacademy.model.User;
+import com.softserve.itacademy.repository.ToDoRepository;
+import com.softserve.itacademy.repository.UserRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.test.context.TestPropertySource;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-import com.softserve.itacademy.repository.UserRepository;
-import com.softserve.itacademy.repository.ToDoRepository;
-
-
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @DataJpaTest
-class ToDoRepositoryTest {
-
-    private final UserRepository userRepository;
-    private final ToDoRepository todoRepository;
+@TestPropertySource(properties = {
+        "spring.test.database.replace=NONE",
+        "spring.datasource.url=jdbc:h2:mem:test;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH",
+        "spring.datasource.username=sa",
+        "spring.datasource.password=",
+        "spring.jpa.hibernate.ddl-auto=update",
+        "spring.sql.init.mode=never"
+})
+public class ToDoRepositoryTest {
 
     @Autowired
-    public ToDoRepositoryTest(UserRepository userRepository, ToDoRepository todoRepository) {
-        this.userRepository = userRepository;
-        this.todoRepository = todoRepository;
+    private ToDoRepository toDoRepository;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @BeforeEach
+    void setup() {
+        toDoRepository.deleteAll();
+        userRepository.deleteAll();
     }
 
     @Test
-    void testGetByUserId_1() {
-        User user1 = new User();
-        user1.setFirstName("Mike");
-        user1.setLastName("Green");
-        user1.setEmail("mike@mail.com");
-        user1.setPassword("1111");
-        user1 = userRepository.save(user1);
+    void testGetByUserId_asOwner() {
 
-        User user2 = new User();
-        user2.setFirstName("Nick");
-        user2.setLastName("Brown");
-        user2.setEmail("nick@mail.com");
-        user2.setPassword("2222");
-        user2 = userRepository.save(user2);
+        User owner = new User();
+        owner.setFirstName("John");
+        owner.setLastName("Doe");
+        owner.setEmail("john.doe@mail.com");
+        owner.setPassword("password123");
+        userRepository.save(owner);
 
-        ToDo todo1 = new ToDo();
-        todo1.setTitle("test todo #1");
-        todo1.setCreatedAt(LocalDateTime.now());
-        todo1.setOwner(user1);
-        todo1 = todoRepository.save(todo1);
 
-        ToDo todo2 = new ToDo();
-        todo2.setTitle("test todo #2");
-        todo2.setCreatedAt(LocalDateTime.now());
-        todo2.setCollaborators(List.of(user1, user2));
-        todo2 = todoRepository.save(todo2);
+        ToDo toDo1 = new ToDo();
+        toDo1.setTitle("ToDo 1");
+        toDo1.setOwner(owner);
+        toDo1.setCreatedAt(LocalDateTime.now());
+        toDoRepository.save(toDo1);
 
-        ToDo todo3 = new ToDo();
-        todo3.setTitle("test todo #3");
-        todo3.setCreatedAt(LocalDateTime.now());
-        todo3.setOwner(user2);
-        todoRepository.save(todo3);
+        ToDo toDo2 = new ToDo();
+        toDo2.setTitle("ToDo 2");
+        toDo2.setOwner(owner);
+        toDo2.setCreatedAt(LocalDateTime.now());
+        toDoRepository.save(toDo2);
 
-        List<ToDo> expected = List.of(todo1, todo2);
-        List<ToDo> actual = todoRepository.getByUserId(user1.getId());
+        List<ToDo> todos = toDoRepository.getByUserId(owner.getId());
 
-        assertArrayEquals(expected.toArray(), actual.toArray());
+        assertEquals(2, todos.size());
+
+        assertEquals("ToDo 1", todos.get(0).getTitle());
+        assertEquals("ToDo 2", todos.get(1).getTitle());
     }
 
     @Test
-    void testGetByUserId_2() {
-        User user1 = new User();
-        user1.setFirstName("Mike");
-        user1.setLastName("Green");
-        user1.setEmail("mike@mail.com");
-        user1.setPassword("1111");
-        user1 = userRepository.save(user1);
+    void testGetByUserId_asCollaborator() {
 
-        User user2 = new User();
-        user2.setFirstName("Nick");
-        user2.setLastName("Brown");
-        user2.setEmail("nick@mail.com");
-        user2.setPassword("2222");
-        user2 = userRepository.save(user2);
+        User collaborator = new User();
+        collaborator.setFirstName("Jane");
+        collaborator.setLastName("Smith");
+        collaborator.setEmail("jane.smith@mail.com");
+        collaborator.setPassword("password456");
+        userRepository.save(collaborator);
 
-        ToDo todo1 = new ToDo();
-        todo1.setTitle("test todo #1");
-        todo1.setCreatedAt(LocalDateTime.now());
-        todo1.setOwner(user1);
-        todoRepository.save(todo1);
 
-        ToDo todo2 = new ToDo();
-        todo2.setTitle("test todo #2");
-        todo2.setCreatedAt(LocalDateTime.now());
-        todo2.setCollaborators(List.of(user1));
-        todoRepository.save(todo2);
+        User owner = new User();
+        owner.setFirstName("John");
+        owner.setLastName("Doe");
+        owner.setEmail("john.doe@mail.com");
+        owner.setPassword("password123");
+        userRepository.save(owner);
 
-        List<ToDo> expected = List.of();
-        List<ToDo> actual = todoRepository.getByUserId(user2.getId());
 
-        assertArrayEquals(expected.toArray(), actual.toArray());
+        ToDo toDo = new ToDo();
+        toDo.setTitle("Collaborative ToDo");
+        toDo.setOwner(owner);
+        toDo.setCreatedAt(LocalDateTime.now());
+        toDo.setCollaborators(List.of(collaborator));
+        toDoRepository.save(toDo);
+
+        List<ToDo> todos = toDoRepository.getByUserId(collaborator.getId());
+
+        assertEquals(1, todos.size());
+
+        assertEquals("Collaborative ToDo", todos.get(0).getTitle());
+    }
+
+    @Test
+    void testGetByUserId_asOwnerAndCollaborator() {
+
+        User user = new User();
+        user.setFirstName("Chris");
+        user.setLastName("Evans");
+        user.setEmail("chris.evans@mail.com");
+        user.setPassword("password789");
+        userRepository.save(user);
+
+        ToDo toDoAsOwner = new ToDo();
+        toDoAsOwner.setTitle("Owner ToDo");
+        toDoAsOwner.setOwner(user);
+        toDoAsOwner.setCreatedAt(LocalDateTime.now());
+        toDoRepository.save(toDoAsOwner);
+
+
+        User anotherOwner = new User();
+        anotherOwner.setFirstName("Mark");
+        anotherOwner.setLastName("Johnson");
+        anotherOwner.setEmail("mark.johnson@mail.com");
+        anotherOwner.setPassword("password321");
+        userRepository.save(anotherOwner);
+
+
+        ToDo toDoAsCollaborator = new ToDo();
+        toDoAsCollaborator.setTitle("Collaborator ToDo");
+        toDoAsCollaborator.setOwner(anotherOwner);
+        toDoAsCollaborator.setCreatedAt(LocalDateTime.now());
+        toDoAsCollaborator.setCollaborators(List.of(user));
+        toDoRepository.save(toDoAsCollaborator);
+
+        List<ToDo> todos = toDoRepository.getByUserId(user.getId());
+
+
+        assertEquals(2, todos.size());
+
+
+        assertThat(todos).extracting(ToDo::getTitle).containsExactlyInAnyOrder("Owner ToDo", "Collaborator ToDo");
     }
 }

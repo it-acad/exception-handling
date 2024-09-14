@@ -5,42 +5,42 @@
       lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Update existing To-Do</title>
+    <title>Update Existing To-Do</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
-    <div layout:fragment="content" style="margin: 0 auto; width: max-content">
-        <h2>Update existing To-Do</h2>
-        <form th:object="${todo}" method="post">
-            <table>
-                <tr>
-                    <td>
-                        <label for="id">Id:</label>
-                    </td>
-                    <td>
-                        <input type="text" th:field="*{id}" id="id" th:value="*{id}" disabled/>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <label for="title">Title:</label>
-                    </td>
-                    <td>
-                        <input type="text" th:field="*{title}" id="title" th:value="*{title}"/>
-                    </td>
-                    <td>
-                        <span th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></span>
-                    </td>
-                </tr>
-                <div class="mb-3">
-                    <input type="reset" class="btn btn-outline-secondary" value="Clear"/>
-                    <input type="submit" class="btn btn-primary" value="Create"/>
-                </div>
-            </table>
-            <input type="hidden" name="id" th:value="*{id}">
-            <input type="hidden" th:field="*{createdAt}" th:value="*{createdAt}">
-        </form>
-        <br>
-        <a th:href="@{|/todos/all/users/${todo.owner.id}|}">Go to To-Do List</a>
-    </div>
+<div layout:fragment="content" class="container mt-5">
+    <h2 class="mb-4">Update Existing To-Do</h2>
+    <form th:object="${todo}" method="post">
+
+        <div class="mb-3">
+            <label for="id" class="form-label">Id:</label>
+            <input type="text" class="form-control" th:field="*{id}" id="id" th:value="*{id}" disabled/>
+        </div>
+
+        <div class="mb-3">
+            <label for="title" class="form-label">Title:</label>
+            <input type="text" class="form-control" th:field="*{title}" id="title" th:value="*{title}"/>
+            <div class="invalid-feedback d-block">
+                <span th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></span>
+            </div>
+        </div>
+
+        <input type="hidden" name="id" th:value="*{id}">
+        <input type="hidden" th:field="*{createdAt}" th:value="*{createdAt}">
+
+        <div class="mb-3 d-flex gap-2">
+            <input type="reset" class="btn btn-outline-secondary" value="Clear"/>
+            <input type="submit" class="btn btn-primary" value="Update"/>
+        </div>
+    </form>
+
+    <!-- Go to To-Do List link -->
+    <a th:href="@{|/todos/all/users/${todo.owner.id}|}" class="btn btn-primary mt-3">Go to To-Do List</a>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.7/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
 </body>
 </html>

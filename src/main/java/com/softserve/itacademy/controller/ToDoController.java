@@ -1,10 +1,10 @@
 package com.softserve.itacademy.controller;
 
 import com.softserve.itacademy.model.ToDo;
+import com.softserve.itacademy.service.TaskService;
 import com.softserve.itacademy.service.ToDoService;
 import com.softserve.itacademy.model.Task;
 import com.softserve.itacademy.model.User;
-import com.softserve.itacademy.service.TaskService;
 import com.softserve.itacademy.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;

@@ -5,20 +5,17 @@
       lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Update existing Task</title>
+    <title>Update Existing Task</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
-<div layout:fragment="content" style="margin: 0 auto; width: max-content">
-    <h2>Update existing Task</h2>
+<div layout:fragment="content" class="container mt-5">
+    <h2 class="mb-4">Update Existing Task</h2>
     <form th:object="${task}" method="post">
 
         <input type="hidden" name="id" th:value="*{id}">
         <input type="hidden" name="todoId" th:value="${task.todoId}">
-
-<!--        <div class="mb-3">-->
-<!--            <label for="id" class="form-label">Id</label>-->
-<!--            <input type="text" class="form-control" th:field="*{id}" id="id" th:value="*{id}" disabled/>-->
-<!--        </div>-->
 
         <div class="mb-3">
             <label for="name" class="form-label">Name</label>
@@ -30,9 +27,10 @@
 
         <div class="mb-3">
             <label for="priority" class="form-label">Priority</label>
-            <select name="priority" id="priority" class="form-select">
-                <option th:each="priority : ${priorities}" th:value="${priority}" th:text="${priority.name()
-                            .substring(0, 1) + priority.name().substring(1).toLowerCase()}"/>
+            <select name="priority" id="priority" class="form-select" th:field="*{priority}">
+                <option th:each="priority : ${priorities}" th:value="${priority}"
+                        th:text="${priority.name().substring(0, 1) + priority.name().substring(1).toLowerCase()}">
+                </option>
             </select>
             <div class="invalid-feedback d-block">
                 <span th:if="${#fields.hasErrors('priority')}" th:errors="*{priority}"></span>
@@ -42,22 +40,23 @@
         <div class="mb-3">
             <label for="state" class="form-label">State</label>
             <select name="stateId" id="state" class="form-select" th:field="*{stateId}">
-                <option th:each="state : ${states}" th:value="${state.id}"
-                        th:text="${state.name}"/>
+                <option th:each="state : ${states}" th:value="${state.id}" th:text="${state.name}"></option>
             </select>
             <div class="invalid-feedback d-block">
                 <span th:if="${#fields.hasErrors('stateId')}" th:errors="*{stateId}"></span>
             </div>
         </div>
 
-        <div class="mb-3">
+        <div class="mb-3 d-flex gap-2">
             <input type="reset" class="btn btn-outline-secondary" value="Clear"/>
             <input type="submit" class="btn btn-primary" value="Update"/>
         </div>
-
     </form>
-    <br>
-    <a th:href="@{|/todos/${task.todoId}/read|}">Go to Task List</a>
+
+    <a th:href="@{|/todos/${task.todoId}/read|}" class="btn btn-primary mt-3">Go to Task List</a>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.7/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
 </body>
 </html>

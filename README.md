@@ -1,31 +1,28 @@
-# Java Online Marathon
+# Practical Java Course
 
 ## To-Do List Project
 
-### Exception Handling
+### Unit Testing and Logging
 
-Create package exception and implement GlobalExceptionHandler - exception handling for custom exception.
+### 📋 Task Overview
 
-Create "Error" page. 
-Page should contain information about exception (message exception).
+### 1. **Develop and Implement Tests:**
+- Create a **test layer** for all controllers in the project.
+- Implement **unit tests** for the controller layer to verify its functionality.
+- Use **JUnit 5** for writing the tests.
 
-Create 404 page and 500 page.
+### 2. **Add Logging:**
+- Implement **logging** in all controllers within the project to track actions and potential errors during runtime.
 
-Implement exception handling with redirection to "Error" page.
+### 3. **Final Submission:**
+- Upload your project to a **GitHub repository**.
+- Record a **short video** (2-5 minutes) demonstrating the implemented functionality (controller testing and logging).
 
-On `service` layer methods
+## 📌 Notes
+- Make sure to provide **links** to the GitHub repository and the video as the final deliverables.
+- Add detailed logs to capture the flow of controller actions.
 
-- create and update should throw NullEntityReferenceException when user try to create or update empty object
-- find and delete should throw EntityNotFoundException exception from jakarta.persistence package when user try to read or delete unexisted object
+## 🛠️ Requirements
+- **JUnit 5** for implementing the tests.
+- A **logging framework** (e.g., SLF4J, Logback) for adding logging to controllers.
 
-
-
-Three users with ADMIN and USER roles are stored in the database.
-
-| Login         | Password | Role  |
-|---------------|:--------:|:-----:|
-| mike@mail.com |   1111   | ADMIN |
-| nick@mail.com |   2222   | USER  |
-| nora@mail.com |   3333   | USER  |
-
-A user with the ADMIN role has full access to all resources.

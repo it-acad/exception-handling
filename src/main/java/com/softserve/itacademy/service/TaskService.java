@@ -7,10 +7,12 @@ import com.softserve.itacademy.repository.StateRepository;
 import com.softserve.itacademy.repository.ToDoRepository;
 import com.softserve.itacademy.repository.TaskRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class TaskService {
@@ -21,7 +23,7 @@ public class TaskService {
     private final TaskTransformer taskTransformer;
 
     public TaskDto create(TaskDto taskDto) {
-        if (taskDto == null){
+        if (taskDto == null) {
             throw new RuntimeException("Task cannot be null");
         }
         Task task = taskTransformer.fillEntityFields(
@@ -42,14 +44,30 @@ public class TaskService {
                 () -> new RuntimeException("Task with id " + id + " not found"));
     }
 
-    public Task update(Task task) {
-            readById(task.getId());
-            return taskRepository.save(task);
+    public TaskDto update(TaskDto taskDto) {
+        if (taskDto == null) {
+            throw new RuntimeException("Task cannot be 'null'");
+        }
+
+        Task existingTask = taskRepository.findById(taskDto.getId()).orElseThrow(
+                () -> new RuntimeException("Task with id " + taskDto.getId() + " not found")
+        );
+
+        Task updatedTask = taskTransformer.fillEntityFields(
+                existingTask,
+                taskDto,
+                toDoRepository.findById(taskDto.getTodoId()).orElseThrow(),
+                stateRepository.findById(taskDto.getStateId()).orElseThrow()
+        );
+
+        Task savedTask = taskRepository.save(updatedTask);
+        return taskTransformer.convertToDto(savedTask);
     }
 
     public void delete(long id) {
         Task task = readById(id);
         taskRepository.delete(task);
+        log.info("Task with id {} was deleted", id);
     }
 
     public List<Task> getAll() {
