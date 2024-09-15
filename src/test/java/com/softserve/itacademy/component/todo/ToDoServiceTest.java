@@ -68,7 +68,6 @@ class ToDoServiceTest {
     void testCorrectReadById() {
         when(todoRepository.findById(anyLong())).thenReturn(Optional.of(expected));
         ToDo actual = todoService.readById(anyLong());
-
         assertEquals(expected, actual);
         verify(todoRepository, times(1)).findById(anyLong());
     }
@@ -132,7 +131,6 @@ class ToDoServiceTest {
 
         when(todoRepository.getByUserId(anyLong())).thenReturn(expectedTodos);
         List<ToDo> actual = todoService.getByUserId(anyLong());
-
         assertEquals(expectedTodos, actual);
         verify(todoRepository, times(1)).getByUserId(anyLong());
     }

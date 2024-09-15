@@ -32,12 +32,10 @@ public class TaskServiceTest {
 
     @Mock
     private TaskRepository taskRepository;
-
     @Mock
     private ToDoRepository toDoRepository;
     @Mock
     private StateRepository stateRepository;
-
     @Mock
     private TaskTransformer taskTransformer;
 
@@ -51,17 +49,15 @@ public class TaskServiceTest {
 
     @BeforeEach
     public void setUp() {
-        // Ініціалізація стану
+
         expectedState = new State();
         expectedState.setId(1L);
         expectedState.setName("New");
 
-        // Ініціалізація ToDo
         expectedToDo = new ToDo();
         expectedToDo.setId(1L);
         expectedToDo.setTitle("Test ToDo");
 
-        // Ініціалізація завдання
         expected = new Task();
         expected.setId(1L);
         expected.setName("test task");
@@ -78,7 +74,7 @@ public class TaskServiceTest {
 
     @Test
     public void testCorrectCreate() {
-        // Ініціалізуємо TaskDto, який буде використаний для створення завдання
+
         TaskDto taskDto = new TaskDto(
                 expected.getId(),
                 expected.getName(),
@@ -87,7 +83,6 @@ public class TaskServiceTest {
                 expected.getState().getId()
         );
 
-        // Налаштування поведінки моків
         when(toDoRepository.findById(taskDto.getTodoId())).thenReturn(Optional.of(expectedToDo));
         when(stateRepository.findByName("New")).thenReturn(expectedState);
         when(taskTransformer.fillEntityFields(any(Task.class), eq(taskDto), eq(expectedToDo), eq(expectedState)))
@@ -95,13 +90,10 @@ public class TaskServiceTest {
         when(taskRepository.save(expected)).thenReturn(expected);
         when(taskTransformer.convertToDto(expected)).thenReturn(taskDto);
 
-        // Викликаємо метод сервісу
         TaskDto actual = taskService.create(taskDto);
 
-        // Перевірка результату
         assertEquals(taskDto, actual);
 
-        // Перевірка викликів моків
         verify(toDoRepository, times(1)).findById(taskDto.getTodoId());
         verify(stateRepository, times(1)).findByName("New");
         verify(taskTransformer, times(1)).fillEntityFields(any(Task.class), eq(taskDto), eq(expectedToDo), eq(expectedState));
@@ -141,7 +133,7 @@ public class TaskServiceTest {
 
     @Test
     public void testCorrectUpdate() {
-        // Ініціалізація TaskDto, який буде використаний як вхідний параметр
+
         TaskDto taskDto = new TaskDto(
                 expected.getId(),
                 expected.getName(),
@@ -150,7 +142,6 @@ public class TaskServiceTest {
                 expected.getState().getId()
         );
 
-        // Налаштування поведінки моків
         when(taskRepository.findById(expected.getId())).thenReturn(Optional.of(expected));
         when(toDoRepository.findById(taskDto.getTodoId())).thenReturn(Optional.of(expectedToDo));
         when(stateRepository.findById(taskDto.getStateId())).thenReturn(Optional.of(expectedState));
@@ -159,13 +150,10 @@ public class TaskServiceTest {
         when(taskRepository.save(expected)).thenReturn(expected);
         when(taskTransformer.convertToDto(expected)).thenReturn(taskDto);
 
-        // Виклик методу сервісу
         TaskDto actual = taskService.update(taskDto);
 
-        // Перевірка результату
         assertEquals(taskDto, actual);
 
-        // Верифікація викликів моків
         verify(taskRepository, times(1)).findById(expected.getId());
         verify(taskTransformer, times(1)).fillEntityFields(eq(expected), eq(taskDto), eq(expectedToDo), eq(expectedState));
         verify(taskRepository, times(1)).save(expected);

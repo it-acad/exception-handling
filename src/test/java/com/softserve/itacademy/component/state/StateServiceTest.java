@@ -54,7 +54,6 @@ class StateServiceTest {
         Exception exception = assertThrows(RuntimeException.class, ()
                 -> stateService.create(null)
         );
-
         assertEquals("State cannot be null", exception.getMessage());
         verify(stateRepository, never()).save(new State());
     }
@@ -63,7 +62,6 @@ class StateServiceTest {
     void testCorrectReadById() {
         when(stateRepository.findById(anyLong())).thenReturn(Optional.of(expected));
         State actual = stateService.readById(anyLong());
-
         assertEquals(expected, actual);
         verify(stateRepository, times(1)).findById(anyLong());
     }
@@ -74,7 +72,6 @@ class StateServiceTest {
         Exception exception = assertThrows(RuntimeException.class, ()
                 -> stateService.readById(id)
         );
-
         assertEquals("State with id " + id + " not found", exception.getMessage());
         verify(stateRepository, times(1)).findById(id);
     }
@@ -84,7 +81,6 @@ class StateServiceTest {
         when(stateRepository.findById(anyLong())).thenReturn(Optional.of(expected));
         when(stateRepository.save(expected)).thenReturn(expected);
         State actual = stateService.update(expected);
-
         assertEquals(expected, actual);
         verify(stateRepository, times(1)).findById(anyLong());
         verify(stateRepository, times(1)).save(expected);
@@ -96,7 +92,6 @@ class StateServiceTest {
         Exception exception = assertThrows(RuntimeException.class, ()
                 -> stateService.update(null)
         );
-
         assertEquals("State cannot be null", exception.getMessage());
         verify(stateRepository, never()).save(new State());
     }
@@ -106,7 +101,6 @@ class StateServiceTest {
         when(stateRepository.findById(anyLong())).thenReturn(Optional.of(new State()));
         doNothing().when(stateRepository).delete(any(State.class));
         stateService.delete(anyLong());
-
         verify(stateRepository, times(1)).findById(anyLong());
         verify(stateRepository, times(1)).delete(any(State.class));
     }
@@ -114,10 +108,8 @@ class StateServiceTest {
     @Test
     void testGetAll() {
         List<State> expectedStates = List.of(new State(), new State(), new State());
-
         when(stateRepository.findAllByOrderById()).thenReturn(expectedStates);
         List<State> actual = stateService.getAll();
-
         assertEquals(expectedStates, actual);
         verify(stateRepository, times(1)).findAllByOrderById();
     }
@@ -126,7 +118,6 @@ class StateServiceTest {
     void testCorrectGetByName() {
         when(stateRepository.findByName(anyString())).thenReturn(expected);
         State actual = stateService.getByName(anyString());
-
         assertEquals(expected, actual);
         verify(stateRepository, times(1)).findByName(anyString());
     }
@@ -136,7 +127,6 @@ class StateServiceTest {
         Exception exception = assertThrows(RuntimeException.class, ()
                 -> stateService.getByName("")
         );
-
         assertEquals("State with name '' not found", exception.getMessage());
         verify(stateRepository, times(1)).findByName(anyString());
     }

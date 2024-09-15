@@ -51,34 +51,29 @@ public class TaskRepositoryTest {
 
     @Test
     void testGetByTodoId_existingTasks() {
-        // Створюємо нового користувача для owner
         User owner = new User();
         owner.setFirstName("John");
         owner.setLastName("Doe");
         owner.setEmail("john.doe@mail.com");
         owner.setPassword("password123");
-        userRepository.save(owner); // Збереження користувача
+        userRepository.save(owner);
 
-        // Створюємо новий об'єкт ToDo з заповненим owner і createdAt
         ToDo toDo1 = new ToDo();
         toDo1.setTitle("ToDo 1");
-        toDo1.setOwner(owner); // Призначаємо користувача власником
-        toDo1.setCreatedAt(LocalDateTime.now()); // Встановлюємо поточну дату
+        toDo1.setOwner(owner);
+        toDo1.setCreatedAt(LocalDateTime.now());
         toDoRepository.save(toDo1);
 
-        // Повторюємо для іншого ToDo
         ToDo toDo2 = new ToDo();
         toDo2.setTitle("ToDo 2");
-        toDo2.setOwner(owner); // Призначаємо того ж власника
-        toDo2.setCreatedAt(LocalDateTime.now()); // Встановлюємо поточну дату
+        toDo2.setOwner(owner);
+        toDo2.setCreatedAt(LocalDateTime.now());
         toDoRepository.save(toDo2);
 
-        // Створюємо новий State
         State state = new State();
         state.setName("New");
         stateRepository.save(state);
 
-        // Створюємо завдання для ToDo 1
         Task task1 = new Task();
         task1.setName("Task 1");
         task1.setPriority(TaskPriority.HIGH);
@@ -93,7 +88,6 @@ public class TaskRepositoryTest {
         task2.setState(state);
         taskRepository.save(task2);
 
-        // Створюємо завдання для ToDo 2
         Task task3 = new Task();
         task3.setName("Task 3");
         task3.setPriority(TaskPriority.MEDIUM);
@@ -101,11 +95,9 @@ public class TaskRepositoryTest {
         task3.setState(state);
         taskRepository.save(task3);
 
-        // Перевіряємо метод getByTodoId для toDo1
         List<Task> tasksForToDo1 = taskRepository.getByTodoId(toDo1.getId());
         assertEquals(2, tasksForToDo1.size());
 
-        // Перевірка полів завдань
         assertEquals("Task 1", tasksForToDo1.get(0).getName());
         assertEquals(TaskPriority.HIGH, tasksForToDo1.get(0).getPriority());
         assertEquals("Task 2", tasksForToDo1.get(1).getName());
@@ -113,31 +105,28 @@ public class TaskRepositoryTest {
     }
     @Test
     void testGetByTodoId_nonExistingTodo() {
-        // Перевіряємо, що для неіснуючого todoId повертається порожній список
+
         List<Task> tasks = taskRepository.getByTodoId(999L);
         assertThat(tasks).isEmpty();
     }
 
     @Test
     void testGetByTodoId_noTasksForTodo() {
-        // Створюємо нового користувача для owner
+
         User owner = new User();
         owner.setFirstName("John");
         owner.setLastName("Doe");
         owner.setEmail("john.doe@mail.com");
         owner.setPassword("password123");
-        userRepository.save(owner); // Зберігаємо користувача
+        userRepository.save(owner);
 
-        // Створюємо новий об'єкт ToDo з заповненими полями owner і createdAt
         ToDo toDo = new ToDo();
         toDo.setTitle("Empty ToDo");
-        toDo.setOwner(owner); // Призначаємо користувача власником
-        toDo.setCreatedAt(LocalDateTime.now()); // Встановлюємо поточну дату і час
+        toDo.setOwner(owner);
+        toDo.setCreatedAt(LocalDateTime.now());
         toDoRepository.save(toDo);
 
-        // Перевіряємо, що для цього ToDo немає завдань
         List<Task> tasks = taskRepository.getByTodoId(toDo.getId());
         assertThat(tasks).isEmpty();
     }
-
 }

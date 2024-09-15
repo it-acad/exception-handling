@@ -49,7 +49,6 @@ public class ToDoRepositoryTest {
         owner.setPassword("password123");
         userRepository.save(owner);
 
-
         ToDo toDo1 = new ToDo();
         toDo1.setTitle("ToDo 1");
         toDo1.setOwner(owner);
@@ -65,7 +64,6 @@ public class ToDoRepositoryTest {
         List<ToDo> todos = toDoRepository.getByUserId(owner.getId());
 
         assertEquals(2, todos.size());
-
         assertEquals("ToDo 1", todos.get(0).getTitle());
         assertEquals("ToDo 2", todos.get(1).getTitle());
     }
@@ -80,14 +78,12 @@ public class ToDoRepositoryTest {
         collaborator.setPassword("password456");
         userRepository.save(collaborator);
 
-
         User owner = new User();
         owner.setFirstName("John");
         owner.setLastName("Doe");
         owner.setEmail("john.doe@mail.com");
         owner.setPassword("password123");
         userRepository.save(owner);
-
 
         ToDo toDo = new ToDo();
         toDo.setTitle("Collaborative ToDo");
@@ -97,9 +93,7 @@ public class ToDoRepositoryTest {
         toDoRepository.save(toDo);
 
         List<ToDo> todos = toDoRepository.getByUserId(collaborator.getId());
-
         assertEquals(1, todos.size());
-
         assertEquals("Collaborative ToDo", todos.get(0).getTitle());
     }
 
@@ -119,14 +113,12 @@ public class ToDoRepositoryTest {
         toDoAsOwner.setCreatedAt(LocalDateTime.now());
         toDoRepository.save(toDoAsOwner);
 
-
         User anotherOwner = new User();
         anotherOwner.setFirstName("Mark");
         anotherOwner.setLastName("Johnson");
         anotherOwner.setEmail("mark.johnson@mail.com");
         anotherOwner.setPassword("password321");
         userRepository.save(anotherOwner);
-
 
         ToDo toDoAsCollaborator = new ToDo();
         toDoAsCollaborator.setTitle("Collaborator ToDo");
@@ -136,11 +128,7 @@ public class ToDoRepositoryTest {
         toDoRepository.save(toDoAsCollaborator);
 
         List<ToDo> todos = toDoRepository.getByUserId(user.getId());
-
-
         assertEquals(2, todos.size());
-
-
         assertThat(todos).extracting(ToDo::getTitle).containsExactlyInAnyOrder("Owner ToDo", "Collaborator ToDo");
     }
 }

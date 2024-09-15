@@ -59,7 +59,6 @@ public class UserServiceTest {
     void testCorrectCreate() {
         when(userRepository.save(expected)).thenReturn(expected);
         User actual = userService.create(expected);
-
         assertEquals(expected, actual);
         verify(userRepository, times(1)).save(expected);
     }
@@ -67,7 +66,6 @@ public class UserServiceTest {
     @Test
     void testExceptionCreate() {
         Exception exception = assertThrows(RuntimeException.class, () -> userService.create(null));
-
         assertEquals("User cannot be null", exception.getMessage());
         verify(userRepository, never()).save(any(User.class));
     }
@@ -76,7 +74,6 @@ public class UserServiceTest {
     void testCorrectReadById() {
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(expected));
         User actual = userService.readById(anyLong());
-
         assertEquals(expected, actual);
         verify(userRepository, times(1)).findById(anyLong());
     }
@@ -84,7 +81,6 @@ public class UserServiceTest {
     @Test
     void testExceptionReadById() {
         Exception exception = assertThrows(EntityNotFoundException.class, () -> userService.readById(-1L));
-
         assertEquals("User with id -1 not found", exception.getMessage());
         verify(userRepository, times(1)).findById(anyLong());
     }
@@ -97,19 +93,16 @@ public class UserServiceTest {
         existingUser.setFirstName("John");
         existingUser.setLastName("Doe");
         existingUser.setEmail("john.doe@mail.com");
-
         UpdateUserDto updateUserDto = new UpdateUserDto();
         updateUserDto.setId(1L);
         updateUserDto.setRole(UserRole.USER);
-
         when(userRepository.findById(updateUserDto.getId())).thenReturn(Optional.of(existingUser));
-        // Використовуємо doNothing() для методу, який має тип повернення void
+
         doNothing().when(userDtoConverter).fillFields(existingUser, updateUserDto);
         when(userRepository.save(existingUser)).thenReturn(existingUser);
         when(userDtoConverter.toDto(existingUser)).thenReturn(new UserDto());
 
-        UserDto updatedUserDto = userService.update(updateUserDto);
-
+        userService.update(updateUserDto);
         assertEquals(UserRole.USER, existingUser.getRole());
         verify(userRepository, times(1)).save(existingUser);
         verify(userRepository, times(1)).findById(updateUserDto.getId());
@@ -134,7 +127,6 @@ public class UserServiceTest {
 
         when(userRepository.findAll()).thenReturn(expectedUsers);
         List<User> actual = userService.getAll();
-
         assertEquals(expectedUsers, actual);
         verify(userRepository, times(1)).findAll();
     }
@@ -143,7 +135,6 @@ public class UserServiceTest {
     void testFindByUsername() {
         when(userRepository.findByEmail("green@mail.com")).thenReturn(Optional.of(expected));
         Optional<User> actual = userService.findByUsername("green@mail.com");
-
         assertThat(actual).isPresent();
         assertEquals(expected, actual.get());
         verify(userRepository, times(1)).findByEmail("green@mail.com");
@@ -155,7 +146,6 @@ public class UserServiceTest {
         when(userDtoConverter.toDto(expected)).thenReturn(new UserDto());
 
         Optional<UserDto> actual = userService.findById(1L);
-
         assertThat(actual).isPresent();
         verify(userRepository, times(1)).findById(anyLong());
         verify(userDtoConverter, times(1)).toDto(expected);
@@ -168,7 +158,6 @@ public class UserServiceTest {
         when(userDtoConverter.toDto(expected)).thenReturn(new UserDto());
 
         List<UserDto> actual = userService.findAll();
-
         assertEquals(1, actual.size());
         verify(userRepository, times(1)).findAll();
         verify(userDtoConverter, times(1)).toDto(expected);

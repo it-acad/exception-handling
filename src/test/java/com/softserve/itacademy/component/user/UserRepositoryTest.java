@@ -53,8 +53,6 @@ public class UserRepositoryTest {
         User actual = userRepository.findByEmail("nick@mail.com").orElseThrow();
 
         assertEquals(expected, actual);
-
-
         assertEquals("Nick", actual.getFirstName());
         assertEquals("Brown", actual.getLastName());
         assertEquals("nick@mail.com", actual.getEmail());
@@ -71,7 +69,6 @@ public class UserRepositoryTest {
         userRepository.save(user);
 
         Optional<User> actual = userRepository.findByEmail("nick@mail.com");
-
         assertThat(actual).isEmpty();
     }
     @Test

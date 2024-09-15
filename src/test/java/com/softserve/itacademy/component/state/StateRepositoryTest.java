@@ -34,12 +34,12 @@ public class StateRepositoryTest {
 
     @BeforeEach
     void setup() {
-        stateRepository.deleteAll(); // Очищення бази даних перед кожним тестом
+        stateRepository.deleteAll();
     }
 
     @Test
     void testFindByName_existingState() {
-        // Створення та збереження станів
+
         State state1 = new State();
         state1.setName("Active");
         stateRepository.save(state1);
@@ -48,7 +48,6 @@ public class StateRepositoryTest {
         state2.setName("Inactive");
         stateRepository.save(state2);
 
-        // Виклик методу та перевірка результату
         State expected = stateRepository.findByName("Inactive");
         assertThat(expected).isNotNull();
         assertEquals("Inactive", expected.getName());
@@ -56,14 +55,14 @@ public class StateRepositoryTest {
 
     @Test
     void testFindByName_nonExistingState() {
-        // Перевірка на відсутність стану в базі
+
         Optional<State> actual = Optional.ofNullable(stateRepository.findByName("NonExistent"));
         assertThat(actual).isEmpty();
     }
 
     @Test
     void testFindAllByOrderById() {
-        // Створення та збереження станів
+
         State state1 = new State();
         state1.setName("Active");
         stateRepository.save(state1);
@@ -72,18 +71,16 @@ public class StateRepositoryTest {
         state2.setName("Inactive");
         stateRepository.save(state2);
 
-        // Виклик методу та перевірка результату
         List<State> states = stateRepository.findAllByOrderById();
         assertThat(states).hasSize(2);
 
-        // Перевірка порядку та значень полів
-        assertThat(states.get(0)).isEqualToComparingFieldByField(state1);
-        assertThat(states.get(1)).isEqualToComparingFieldByField(state2);
+
+        assertThat(states.get(0)).usingRecursiveComparison().isEqualTo(state1);
+        assertThat(states.get(1)).usingRecursiveComparison().isEqualTo(state2);
     }
 
     @Test
     void testFindAllByOrderById_emptyDatabase() {
-        // Перевірка, що база даних порожня
         List<State> states = stateRepository.findAllByOrderById();
         assertThat(states).isEmpty();
     }
