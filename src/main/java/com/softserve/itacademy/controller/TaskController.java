@@ -1,6 +1,7 @@
 package com.softserve.itacademy.controller;
 
 import com.softserve.itacademy.dto.TaskDto;
+import com.softserve.itacademy.model.Task;
 import com.softserve.itacademy.model.TaskPriority;
 import com.softserve.itacademy.dto.TaskTransformer;
 import com.softserve.itacademy.service.StateService;
@@ -31,14 +32,14 @@ public class TaskController {
         model.addAttribute("task", new TaskDto());
         model.addAttribute("todo", todoService.readById(todoId));
         model.addAttribute("priorities", TaskPriority.values());
-        System.out.println("Returning todo with id" + todoId + " for creating new task for this todo");
+        log.info("Returning todo with id {} for creating new task for this todo", todoId);
         return "create-task";
     }
 
     @PostMapping("/create/todos/{todo_id}")
     public String create(@PathVariable("todo_id") long todoId, Model model,
                          @Validated @ModelAttribute("task") TaskDto taskDto, BindingResult result) {
-        System.out.println("Received request to create task " + taskDto);
+        log.info("Received request to create task {}", taskDto);
         if (result.hasErrors()) {
             model.addAttribute("todo", todoService.readById(todoId));
             model.addAttribute("priorities", TaskPriority.values());
@@ -47,42 +48,47 @@ public class TaskController {
         }
 
         taskService.create(taskDto);
-        System.out.println("Task " + taskDto + " was created");
+        log.info("Task {} was created", taskDto);
 
         return "redirect:/todos/" + todoId + "/tasks";
     }
 
     @GetMapping("/{task_id}/update/todos/{todo_id}")
     public String taskUpdateForm(@PathVariable("task_id") long taskId, @PathVariable("todo_id") long todoId, Model model) {
-        System.out.println("Received request to get task with id " + taskId + "from todo with id " + todoId + "for updating this task");
+        log.info("Received request to get task with id {} from todo with id {} for updating this task", taskId, todoId);
         TaskDto taskDto = taskTransformer.convertToDto(taskService.readById(taskId));
         model.addAttribute("task", taskDto);
         model.addAttribute("priorities", TaskPriority.values());
         model.addAttribute("states", stateService.getAll());
-        System.out.println("Task " + taskDto + " was loaded");
+        log.info("Task {} was loaded", taskDto);
         return "update-task";
     }
 
     @PostMapping("/{task_id}/update/todos/{todo_id}")
     public String update(@PathVariable("task_id") long taskId, @PathVariable("todo_id") long todoId, Model model,
                          @Validated @ModelAttribute("task") TaskDto taskDto, BindingResult result) {
-        System.out.println("Received request to update task " + taskDto);
+        log.info("Received request to update task {}", taskDto);
         if (result.hasErrors()) {
             model.addAttribute("priorities", TaskPriority.values());
             model.addAttribute("states", stateService.getAll());
             return "update-task";
         }
-
+        Task task = taskTransformer.fillEntityFields(
+                new Task(),
+                taskDto,
+                todoService.readById(taskDto.getTodoId()),
+                stateService.readById(taskDto.getStateId())
+        );
         taskService.update(taskDto);
-        System.out.println("Task " + taskDto + " was updated");
+        log.info("Task {} was updated", taskDto);
         return "redirect:/todos/" + todoId + "/tasks";
     }
 
     @GetMapping("/{task_id}/delete/todos/{todo_id}")
     public String delete(@PathVariable("task_id") long taskId, @PathVariable("todo_id") long todoId) {
-        System.out.println("Received request to delete task with id " + taskId);
+        log.info("Received request to delete task with id {}", taskId);
         taskService.delete(taskId);
-        System.out.println("Task with id " + taskId + " was deleted");
+        log.info("Task with id {} was deleted", taskId);
         return "redirect:/todos/" + todoId + "/tasks";
     }
 }

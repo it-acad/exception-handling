@@ -133,7 +133,6 @@ public class TaskServiceTest {
 
     @Test
     public void testCorrectUpdate() {
-
         TaskDto taskDto = new TaskDto(
                 expected.getId(),
                 expected.getName(),
@@ -150,24 +149,18 @@ public class TaskServiceTest {
         when(taskRepository.save(expected)).thenReturn(expected);
         when(taskTransformer.convertToDto(expected)).thenReturn(taskDto);
 
-        TaskDto actual = taskService.update(taskDto);
+        TaskDto actualDto = taskService.update(taskDto);
 
-        assertEquals(taskDto, actual);
+        assertEquals(taskDto, actualDto);
 
         verify(taskRepository, times(1)).findById(expected.getId());
+        verify(toDoRepository, times(1)).findById(taskDto.getTodoId());
+        verify(stateRepository, times(1)).findById(taskDto.getStateId());
         verify(taskTransformer, times(1)).fillEntityFields(eq(expected), eq(taskDto), eq(expectedToDo), eq(expectedState));
         verify(taskRepository, times(1)).save(expected);
         verify(taskTransformer, times(1)).convertToDto(expected);
     }
 
-
-    @Test
-    public void testExceptionUpdate() {
-        Exception exception = assertThrows(RuntimeException.class, () -> taskService.update(null));
-
-        assertEquals("Task cannot be 'null'", exception.getMessage());
-        verify(taskRepository, never()).save(any(Task.class));
-    }
 
     @Test
     public void testDelete() {

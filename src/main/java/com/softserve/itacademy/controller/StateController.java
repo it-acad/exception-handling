@@ -20,7 +20,7 @@ public class StateController {
     public String listStates(Model model) {
         log.info("Received request to get all states");
         model.addAttribute("states", stateService.findAll());
-        System.out.println("Returning all states");
+        log.info("Returning all states");
         return "state/state-list";
     }
 

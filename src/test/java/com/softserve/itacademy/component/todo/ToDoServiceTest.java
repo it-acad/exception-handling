@@ -96,12 +96,10 @@ class ToDoServiceTest {
 
     @Test
     void testExceptionUpdate() {
-        Exception exception = assertThrows(RuntimeException.class, ()
-                -> todoService.update(null)
-        );
+        Exception exception = assertThrows(RuntimeException.class, () -> todoService.update(null));
 
         assertEquals("ToDo cannot be null", exception.getMessage());
-        verify(todoRepository, never()).save(new ToDo());
+        verify(todoRepository, never()).save(any(ToDo.class));
     }
 
     @Test
